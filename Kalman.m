@@ -212,7 +212,7 @@ X Runs  a single step  of  the steady state Kalman filter
 function xhat                                               = sskf(A,  B,  C,                                0,  xhat,  y,  u,  Kinf)
 X Propagation
 'that                                                       = A *  xhat + B                                  u;
-X Correction
+X Correction .
                                                             xhat = xhat                                      + Kinf                        *                                               (y      - C                                       xhat   -- D   -  u)   ;
 end
                                                                                                              XX etas FUNCTION DEFINITION
