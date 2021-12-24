@@ -182,7 +182,7 @@ VocO                                                 = 3.435;
                                                                                                           xhatKF = zeros(2,  n);
 xhatKF(1)                                                                                                 =                          1;
 Pkf                                                                                                       = zeros(2,                                       2,  n);
-Pkf(1:2,                                                                                                  1:2,                                        1)   = Rk      * eye(2);
+Pkf(1:2,     test                                                                                              1:2,                                        1)   = Rk      * eye(2);
 for  ii                                              =                                                    1:n                        -                1
                                                                                                           [xhatKF(:,  ii                                   +         1),  Pkf(:,                                   +   1)]   = kf(A,   B,   C,   D,   Qk,   Rk,   xhatKF(:,   ii),   V(ii)-Vc
 end
