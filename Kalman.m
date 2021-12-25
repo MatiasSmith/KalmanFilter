@@ -359,23 +359,22 @@ function formatlatex
 %Color plots version
 
 reset(groot)
-set(groot, 'defaultaxeslinestyleorder', {'-', ':', '-.', '--'}, 'defaultaxesnextplot',   'adc
-set(groot,                                     'defaulttextinterpreter',  'latex')
-set(groot,                                     'defaultcolorbarticklabelinterpreter'                                                                              , 'latex')
-set(groot,                                     'defaultfigureunits',  'normalized')
-set(groot,                                     idefaultfigureposition',                       [0.01,                    0.01,                                     0.3,                             0.4])
-set(groot,                                     'defaultaxesticklabelinterpreter',  'latex')
-set(groot,                                     idefaultlegendinterpreter',  'latex')
-set(groot,                                     'defaultaxesfontsize',                         24)
-set(groot,                                     'defaultaxeslinewidth',                        1)
-18
+% FINISH THIS LINE set(groot, 'defaultaxeslinestyleorder', {'-', ':', '-.', '--'}, 'defaultaxesnextplot',   adc
+set(groot, 'defaulttextinterpreter',  'latex')
+set(groot, 'defaultcolorbarticklabelinterpreter', 'latex')
+set(groot, 'defaultfigureunits',  'normalized')
+set(groot, 'defaultfigureposition', [0.01, 0.01, 0.3, 0.4])
+set(groot, 'defaultaxesticklabelinterpreter', 'latex')
+set(groot, 'defaultlegendinterpreter',  'latex')
+set(groot, 'defaultaxesfontsize', 24)
+set(groot, 'defaultaxeslinewidth', 1)
 
-set(groot,   'defaultscattermarker',  'o')
-set(groot,   'defaultscatterlinewidth',                                                                                             2)
-set(groot,   'defaultlinemarkersize',                                                                                               15)
-set(groot,   'defaultlinelinewidth',                                                                                                2.5)
-set(groot,                                                                        'defaultAxesXgrid',  'on',  'defaultAxesYgrid',             on   , idefaultAxesZgridl,  'on')
-set(groot,                                   idefaultAxesGridLineStyle',  '-.')
-set(groot,   idefaultAxesXlimi,              [0,                                  2                                                 * pi]);
-set(groot,   IdefaultAxesYlim',                                                   [-0.6,                                            0.6]);
+set(groot, 'defaultscattermarker',  'o')
+set(groot, 'defaultscatterlinewidth', 2)
+set(groot, 'defaultlinemarkersize', 15)
+set(groot, 'defaultlinelinewidth', 2.5)
+set(groot, 'defaultAxesXgrid',  'on',  'defaultAxesYgrid', 'on', idefaultAxesZgridl,'on')
+set(groot, 'defaultAxesGridLineStyle',  '-.')
+set(groot, 'defaultAxesXlim', [0, 2 * pi]);
+set(groot, 'defaultAxesYlim', [-0.6, 0.6]);
 end
