@@ -14,15 +14,16 @@ load OCV_table.mat
 load OCV_slope_table.mat
 load IV_data_linear.mat
 
-T = 0.1;
+T = 0.1;   %Sampling Period
 RO = 0.01;
 Rc = 0.015;
 Ccap = 2400;
 Cbat = 18000;
 VocO = 3.435;
 alp = 0.65;
-n =  length(t);
-                                    % System information
+n = length(t);
+
+% System information
 Qk = [2.5E-7,0;0,0];
 % Qk = (0.0005, 0; 0,0];
 Rk = 1E-4;
@@ -51,7 +52,7 @@ Pkf = zeros(2,2,n);
 
 %%% b. Kalman Filter and open loop estimate
 for ii = 1:n -1
-    [xhatKF(:, ii + 1), Pkf(:, :, ii+1)] = kf(A, B, C, D, Qk, Rk, xhatKF(:, ii), V(ii)-Voc0)  %NOT SURE
+    [xhatKF(:, ii + 1), Pkf(:, :, ii+1)] = kf(A, B, C, D, Qk, Rk, xhatKF(:, ii), V(ii)-Voc0)  %NOT FINISHED Declaration on line 236
     SOCdr(ii+1) = SOCdr(ii) + B(1) * I(ii); %dead reckoning
 end
 
@@ -89,7 +90,7 @@ plot(t,  SOChatss,  'DisplayName',  "Steady-State KF")
 plot(t,  SOCdr,  'DisplayName',  "Open Loop")
 xlim([0, 9E3])
 legend
-title["SOC Estimate Using Steady-State Kalman Filter, Open Loop Estimate and", "Actual SOC vs. Time"]) 
+title(["SOC Estimate Using Steady-State Kalman Filter, Open Loop Estimate and", "Actual SOC vs. Time"]) 
 xlabel("time (s)")
 ylabel("SOC")
 Saveas(gcf, "./Figures/1c.jpg")
@@ -112,7 +113,7 @@ sig = sqrt(Pkf(1, 1, end));
 histcomparison(e, t, sig, mu)
 saveas(gcf, "./Figures/1hist.jpg")
 
-%%Problem 2. EKF
+%%Problem 2. EKF for non-linear data
 close all
 clear xhatKF SOChat
 load IV_data_nonlinear.mat
@@ -159,7 +160,7 @@ Pekf = zeros(2, 2, n);
 Pekf(1:2, 1:2, 1) = Rk * eye(2);
 
 tic
-for ii = 2:n
+for ii = 2:n        %Declaration on line 319
     [xhatEKF(:, ii), Pekf(:, :, ii)] = ekf(t(ii-1), t(ii), xhatEKF(:, ii-1), ...
         Pekf(:, :, ii-1), ufn, V(ii)-Voc0, ff, hc, Ffn, Hfn, Qk, Rk);
     if mod(ii, 20) == 0
@@ -235,7 +236,7 @@ saveas(gcf, "./Figures/3hist.jpg")
 function [xhat, P] = kf(A, B, C, D, Q, R, xhat, y, u, P)
 
 %Propagation
-xhat = A * xhat + B * u;
+xhat = A * xhat + B * u;  %u is I(t)
 P = A * P * A.' + Q;
 
 %Kalman Gain
@@ -288,7 +289,7 @@ function xk = rk2s(f, t, x, u, dt)
 % xk: states at next time step
 
 d1 = f(t, x, u(t));
-d2 - f(t+0.5*dt, x+0.5*dt*d1, u(t + 0.5 * dt));
+d2 = f(t+0.5*dt, x+0.5*dt*d1, u(t + 0.5 * dt));
 xk = x+dt / 2 * (d1 + d2);
 
 end
@@ -314,7 +315,7 @@ xk = x + dt / 6 * (d1 + 2 * d2 + 2 * d3 + d4);
 
 end
 
-%% ekf FUNCTION DEFINITION
+%% ekf FUNCTION DEFINITION     %Called on Line 164
 function [xhat, P] = ekf(tkm1, tk, xhat, P, ufn, y, f, h, Ffn, Hfn, Q, R)
 
 u = ufn(tk);
@@ -373,7 +374,7 @@ set(groot, 'defaultscattermarker',  'o')
 set(groot, 'defaultscatterlinewidth', 2)
 set(groot, 'defaultlinemarkersize', 15)
 set(groot, 'defaultlinelinewidth', 2.5)
-set(groot, 'defaultAxesXgrid',  'on',  'defaultAxesYgrid', 'on', idefaultAxesZgridl,'on')
+set(groot, 'defaultAxesXgrid', 'on',  'defaultAxesYgrid', 'on', 'defaultAxesZgrid','on')
 set(groot, 'defaultAxesGridLineStyle',  '-.')
 set(groot, 'defaultAxesXlim', [0, 2 * pi]);
 set(groot, 'defaultAxesYlim', [-0.6, 0.6]);
