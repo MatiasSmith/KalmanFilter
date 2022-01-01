@@ -7,7 +7,7 @@ warning('off',  'all')
 mkdir('./Figures')
 warning('on',  'all')
 
-V = [10, 11, 12, 13, 15, 14, 17, 18]
+V = [0.3, 0.6, 0.5, 0.4, 0.5, 0.3, 0.6, 0.4]
 t = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
 I = [5, 5.5, 6, 6.5, 7.5, 7, 8.5, 9]
 
@@ -35,10 +35,10 @@ Voc0 = interp1(soc_intpts_OCV, OCV_intpts, 0);  %Using graph, predict value at t
 Vocfn = @(SOC) interp1(soc_intpts_OCV_slope, OCV_slope_intpts, SOC, 'pchip') - Voc0;
 
 %Nonlinear Vocdot(SOC) function
-Vocdot = @(SOC) interp1(soc_intpts_OCV_slope, OCV_slope_intpts, SOC, 'pchip')
+Vocdot = @(SOC) interp1(soc_intpts_OCV_slope, OCV_slope_intpts, SOC, 'pchip') %Predict "voltage" at SOC
 
 %Input function
-ufn = @(t) interp1((1:n)*T, I, t);
+ufn = @(t) interp1((1:n)*T, I, t);   %Doesn't start at 0? Find the I value at time t
 
 % Continuous-time nonlinear battery model function
 fc = @(t, x, u) [-u / Cbat; ...
@@ -60,22 +60,25 @@ Ap = [0, 0; 0, -1 / (Ccap * Rc)];
 Cp = @(x) [Vocdot(x(1)), 0];
 
 %Discretize the Jacobians
-Ffn = @(varargin) expm(Ap * dt);
+Ffn = @(varargin) expm(Ap * dt);  %Varargin means any number on input arguments, index by varargin{1}...
 Hfn = @(~, x, ~) Cp(x);
 
 % Initial conditions of estimate and covariance matrix
 xhatEKF = zeros(2, n);
 xhatEKF(1) = 1;
 Pekf = zeros(2, 2, n);
-Pekf(1:2, 1:2, 1) = Rk * eye(2);
-SOC_act = V(1, :);
+Pekf(1:2, 1:2, 1) = Rk * eye(2); %eye is 2x2 identity matrix
+SOC_act = V;
 SOCdr = zeros(1,n);
 SOCdr(1) = 1;
+Bc = [-1 / Cbat, 1 / Ccap].';
+B = [T * Bc(1, 1), Rc * exp(-T / (Rc * Ccap)) * (exp(T / (Rc * Ccap)) -1)].';
 
 tic
 for ii = 2:n        %Declaration on line 319
     [xhatEKF(:, ii), Pekf(:, :, ii)] = ekf(t(ii-1), t(ii), xhatEKF(:, ii-1), ...
         Pekf(:, :, ii-1), ufn, V(ii)-Voc0, ff, hc, Ffn, Hfn, Qk, Rk);
+    SOCdr(ii) = SOCdr(ii-1) + B(1) * I(ii-1);
     if mod(ii, 20) == 0
         clc
         fprintf("Running Time Step")
@@ -123,18 +126,26 @@ xk = x + dt / 6 * (d1 + 2 * d2 + 2 * d3 + d4);
 
 %% ekf FUNCTION DEFINITION     %Called on Line 164
 function [xhat, P] = ekf(tkm1, tk, xhat, P, ufn, y, f, h, Ffn, Hfn, Q, R)
+%tkm1: Previous time
+%tk: Current time
+%xhat: 2x1 matrix of previous xhat
+%P:2x2 matrix
+%y: V(ii)-Voc0 (relative voltage)
+%f: State at next time step (output of function)
+%
 
-u = ufn(tk);
 
-F = Ffn(tkm1, tk, xhat, u);
+u = ufn(tk);    %Predict I at time tk
+
+F = Ffn(tkm1, tk, xhat, u);    %F = e^matrix..
 
 xhat = f(tkm1, tk, xhat, ufn);   %Prediction
-P = F * P * F.' + Q;             %Prediction
+P = F * P * F.' + Q;             %Prediction P is 2x2
 
-H = Hfn(tk, xhat, u);            
+H = Hfn(tk, xhat, u);            %H = [Predicted value at xhat(1), 0]
 
 Lk = P * H.' * (H * P * H.' + R)^-1;    %Kalman Gain
 
-xhat = xhat + Lk*(y - h(tk, xhat, u));  %Correction
-P = P - Lk * H * P;                     %Correction
+xhat = xhat + Lk*(y - h(tk, xhat, u));  %Correction Update Voltage estimate
+P = P - Lk * H * P;                     %Correction Update estimate uncertainty
 end
