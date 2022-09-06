@@ -4,6 +4,7 @@
 // The program must read data from SOC_data_sim.csv
 // A csv file with all the estimated values named kalman_SOC_estimate.csv is generated.
 // In the generated csv, you can compare the actual SOC values to the estimated SOC values.
+// Developed by Matias Smith and Ayush Saha
 
 #include<stdio.h>
 #include<math.h>
